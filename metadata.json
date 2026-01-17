@@ -1,0 +1,5 @@
+{
+  "name": "Onyx Monitor",
+  "description": "A high-end, real-time observability suite for Vercel & Supabase applications. Monitor traffic, errors, and geolocation data with a minimal, fashion-forward aesthetic.",
+  "requestFramePermissions": []
+}
