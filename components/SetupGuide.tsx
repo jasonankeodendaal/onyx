@@ -258,7 +258,7 @@ export const initOnyx = () => {
                    <div>
                      <h3 className="text-white font-medium mb-1">Create Project</h3>
                      <p className="text-sm text-gray-500 mb-2">
-                       Go to <a href="https://supabase.com" target="_blank" className="text-blue-400 hover:underline">Supabase.com</a>. New Project > Name it "Onyx".
+                       Go to <a href="https://supabase.com" target="_blank" className="text-blue-400 hover:underline">Supabase.com</a>. New Project &gt; Name it "Onyx".
                      </p>
                    </div>
                  </div>
@@ -290,7 +290,7 @@ export const initOnyx = () => {
                    <div>
                      <h3 className="text-white font-medium mb-1">Get Credentials</h3>
                      <p className="text-sm text-gray-500">
-                       Go to <strong>Project Settings > API</strong>. Copy <code>Project URL</code> and <code>anon key</code>.
+                       Go to <strong>Project Settings &gt; API</strong>. Copy <code>Project URL</code> and <code>anon key</code>.
                      </p>
                    </div>
                  </div>
@@ -335,7 +335,7 @@ export const initOnyx = () => {
                       <div>
                         <h4 className="text-white font-medium">2. Import to Vercel</h4>
                         <p className="text-sm text-gray-500 mt-1">
-                          Go to Vercel. Import Repo. <strong>Deploy.</strong>
+                          Go to Vercel. Import Repo. <strong>Deploy.</strong> Vercel will auto-detect the configuration.
                         </p>
                       </div>
                     </div>
