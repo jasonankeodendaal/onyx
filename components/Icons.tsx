@@ -51,7 +51,8 @@ import {
   Box,
   Cloud,
   Phone,
-  Mail
+  Mail,
+  Upload
 } from 'lucide-react';
 
 export { 
@@ -106,5 +107,6 @@ export {
   Box,
   Cloud,
   Phone,
-  Mail
+  Mail,
+  Upload
 };
