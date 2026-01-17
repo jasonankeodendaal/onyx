@@ -1,6 +1,6 @@
 import React from 'react';
 import SetupGuide from '../components/SetupGuide';
-import { Database, Server, Code, CheckCircle, ArrowUpRight, Shield, Globe } from '../components/Icons';
+import { Database, Server, Code, CheckCircle, ArrowUpRight, Shield, Globe, AlertCircle } from '../components/Icons';
 
 const Docs: React.FC = () => {
   return (
@@ -12,6 +12,22 @@ const Docs: React.FC = () => {
         <p className="text-xl text-gray-400 font-light max-w-3xl leading-relaxed">
           This manual covers the complete lifecycle of deploying Onyx: from setting up your global database to instrumenting your application fleet on Vercel.
         </p>
+      </div>
+
+      {/* Troubleshooting Alert (Top) */}
+      <div className="bg-red-950/20 border border-red-900/50 p-6 rounded-xl mb-12 flex items-start gap-4">
+        <AlertCircle className="w-6 h-6 text-red-500 mt-1 flex-shrink-0" />
+        <div>
+          <h3 className="text-lg font-medium text-white mb-1">Important: Do not confuse SQL with JavaScript</h3>
+          <p className="text-gray-400 text-sm">
+            A common error (42601) occurs when users accidentally paste the <strong>JavaScript Agent Code</strong> into the <strong>Supabase SQL Editor</strong>. 
+            <br/>
+            <ul>
+              <li className="list-disc ml-5 mt-2">Use the <strong>SQL Editor</strong> only for creating tables (Phase 2 in guide).</li>
+              <li className="list-disc ml-5">Use the <strong>JavaScript Agent</strong> inside your VS Code project (Phase 4 in guide).</li>
+            </ul>
+          </p>
+        </div>
       </div>
 
       {/* Step-by-Step Written Guide */}
@@ -35,7 +51,7 @@ const Docs: React.FC = () => {
                </li>
                <li className="flex gap-3 text-sm text-gray-300">
                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                 <span>Go to <strong>SQL Editor</strong> and run the script below.</span>
+                 <span>Go to <strong>SQL Editor</strong> and run the <code>setup.sql</code> script.</span>
                </li>
                <li className="flex gap-3 text-sm text-gray-300">
                  <Shield className="w-5 h-5 text-yellow-500 flex-shrink-0" />
@@ -76,9 +92,9 @@ const Docs: React.FC = () => {
       </div>
 
       <div className="bg-onyx-900/50 border border-onyx-800 rounded-xl p-8 mb-16">
-         <h2 className="text-white font-serif text-xl mb-4">Initialization Script</h2>
+         <h2 className="text-white font-serif text-xl mb-4">Interactive Setup</h2>
          <p className="text-gray-400 mb-8 max-w-2xl text-sm">
-           Copy the SQL below and run it in your Supabase SQL Editor. This sets up the <code>sites</code> and <code>events</code> tables and configures the permissions required for 24/7 scanning.
+           Follow this interactive guide to obtain your SQL Schema and Client Agents.
          </p>
          <SetupGuide />
       </div>

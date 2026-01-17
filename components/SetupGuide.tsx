@@ -19,7 +19,10 @@ const SetupGuide: React.FC = () => {
   };
 
   const REACT_SNIPPET = `/**
+ * --------------------------------------------------------
  * ONYX DEEP SCAN AGENT (Vite / React)
+ * ⚠️ THIS IS JAVASCRIPT CODE. DO NOT RUN IN SQL EDITOR.
+ * --------------------------------------------------------
  * 1. Install Supabase: npm install @supabase/supabase-js
  * 2. Create this file at: src/lib/onyx.js
  * 3. Import and call initOnyx() in your root layout/component.
@@ -105,7 +108,8 @@ export const initOnyx = () => {
 
   const HTML_SNIPPET = `<!-- 
   ONYX DEEP SCAN AGENT
-  Paste this into the <head> tag of your index.html
+  ⚠️ PASTE THIS INTO THE <HEAD> TAG OF YOUR INDEX.HTML
+  DO NOT RUN IN SQL EDITOR
 -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
@@ -376,6 +380,10 @@ export const initOnyx = () => {
                     <div>
                       <h2 className="text-2xl font-serif text-white">The Scanner (Agent)</h2>
                       <p className="text-gray-400 text-sm">Paste this code into the websites you want to monitor to enable 24/7 scanning.</p>
+                      <p className="text-red-400 text-xs mt-2 font-bold uppercase tracking-wider flex items-center gap-2">
+                        <AlertCircle className="w-3 h-3" />
+                        Warning: Do NOT run this code in the Supabase SQL Editor.
+                      </p>
                     </div>
                  </div>
 

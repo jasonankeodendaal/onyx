@@ -183,6 +183,15 @@ const SiteDetail: React.FC<SiteDetailProps> = ({ siteId, onBack }) => {
     setChecking(false);
   };
 
+  // Automate the checkStatus on mount and interval
+  useEffect(() => {
+    if (site?.url) {
+      checkStatus(); // Initial Check
+      const interval = setInterval(checkStatus, 60000); // Check every 60 seconds
+      return () => clearInterval(interval);
+    }
+  }, [site?.url]);
+
   if (!site) return <div className="p-20 text-center text-gray-500">Initializing Uplink...</div>;
 
   return (

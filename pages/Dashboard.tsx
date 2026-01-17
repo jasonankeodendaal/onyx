@@ -116,8 +116,16 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   // Dynamic Snippet Generation for the new site
   const getSnippet = (siteId: string, type: 'react' | 'html') => {
     if (type === 'react') {
-      return `// 1. Install Supabase: npm install @supabase/supabase-js
-// 2. Create file: src/lib/onyx.js
+      return `/**
+ * ------------------------------------------------------------------
+ * ONYX TELEMETRY AGENT (JAVASCRIPT / REACT)
+ * ------------------------------------------------------------------
+ * ⚠️ IMPORTANT: This is JAVASCRIPT code. 
+ * DO NOT RUN THIS IN THE SUPABASE SQL EDITOR.
+ * ------------------------------------------------------------------
+ * 1. Install Supabase: npm install @supabase/supabase-js
+ * 2. Create file: src/lib/onyx.js and paste this content.
+ */
 import { createClient } from '@supabase/supabase-js';
 
 const ONYX_SITE_ID = '${siteId}';
@@ -158,7 +166,11 @@ export const initOnyx = () => {
 // 3. In your Root Layout or App Component:
 // useEffect(() => { initOnyx(); }, []);`;
     }
-    return `<!-- Paste in <head> of index.html -->
+    return `<!-- 
+  ONYX AGENT (HTML)
+  ⚠️ PASTE THIS IN YOUR INDEX.HTML <HEAD> SECTION
+  DO NOT RUN IN SQL EDITOR
+-->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
   (function() {
