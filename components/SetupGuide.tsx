@@ -37,6 +37,10 @@ const SUPABASE_KEY = import.meta.env.VITE_PUBLIC_SUPABASE_ANON_KEY;
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 const SESSION_ID = Math.random().toString(36).substring(7);
 
+// Simple Location Proxy
+const LOCALE = Intl.DateTimeFormat().resolvedOptions();
+const REGION = LOCALE.timeZone || 'Unknown';
+
 export const initOnyx = () => {
   if (typeof window === 'undefined') return;
 
@@ -49,6 +53,7 @@ export const initOnyx = () => {
         path: window.location.pathname,
         referrer: document.referrer,
         device: /Mobi/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop',
+        country: REGION, // Proxy for location
         created_at: new Date().toISOString(),
         ...payload
       });
@@ -63,36 +68,36 @@ export const initOnyx = () => {
   // 2. Global Error Capture (The "Scanner")
   window.addEventListener('error', (event) => {
     track('error', {
-      metadata: JSON.stringify({
+      metadata: {
         message: event.message,
         source: event.filename,
         lineno: event.lineno,
         colno: event.colno,
         stack: event.error?.stack
-      })
+      }
     });
   });
 
   // 3. Promise Rejections
   window.addEventListener('unhandledrejection', (event) => {
     track('error', {
-      metadata: JSON.stringify({
+      metadata: {
         message: 'Unhandled Promise Rejection: ' + event.reason,
         stack: event.reason?.stack
-      })
+      }
     });
   });
 
   // 4. Interaction Tracking
   window.addEventListener('click', (e) => {
-    const target = e.target.closest('button, a, input, [role="button"]');
+    const target = (e.target as Element).closest('button, a, input, [role="button"]');
     if (target) {
       track('click', {
-        metadata: JSON.stringify({
+        metadata: {
           tag: target.tagName,
-          text: target.innerText?.substring(0, 50),
+          text: (target as HTMLElement).innerText?.substring(0, 50),
           id: target.id
-        })
+        }
       });
     }
   });
@@ -113,11 +118,13 @@ export const initOnyx = () => {
     if (!window.supabase) return;
     const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     const SESSION = Math.random().toString(36).substring(7);
+    const REGION = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Unknown';
 
     const track = (t, d={}) => client.from('events').insert({
       site_id: SITE_ID, type: t, session_id: SESSION,
       path: window.location.pathname,
       device: /Mobi/i.test(navigator.userAgent)?'Mobile':'Desktop',
+      country: REGION,
       created_at: new Date().toISOString(),
       ...d
     });
@@ -127,13 +134,13 @@ export const initOnyx = () => {
 
     // 2. Errors
     window.addEventListener('error', e => track('error', { 
-      metadata: JSON.stringify({ msg: e.message, src: e.filename, line: e.lineno }) 
+      metadata: { msg: e.message, src: e.filename, line: e.lineno } 
     }));
 
     // 3. Clicks
     window.addEventListener('click', e => {
       const t = e.target.closest('a, button');
-      if(t) track('click', { metadata: JSON.stringify({ tag: t.tagName, text: t.innerText }) });
+      if(t) track('click', { metadata: { tag: t.tagName, text: t.innerText } });
     });
   })();
 </script>`;

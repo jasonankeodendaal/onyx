@@ -92,6 +92,16 @@ const SiteDetail: React.FC<SiteDetailProps> = ({ siteId, onBack }) => {
     };
   };
 
+  const parseMetadata = (metadata: any) => {
+    if (!metadata) return {};
+    if (typeof metadata === 'object') return metadata;
+    try {
+      return JSON.parse(metadata);
+    } catch {
+      return { message: String(metadata) };
+    }
+  };
+
   const stats = useMemo(() => {
     const pageviews = events.filter(e => e.type === 'pageview');
     const errors = events.filter(e => e.type === 'error' || e.type === 'network_fail');
@@ -138,8 +148,9 @@ const SiteDetail: React.FC<SiteDetailProps> = ({ siteId, onBack }) => {
   const exportData = () => {
     const csvContent = "data:text/csv;charset=utf-8," + "Type,Path,Message,Country,Time\n" + events.map(e => {
         let msg = '';
-        try { if(e.metadata) msg = JSON.parse(e.metadata).message || ''; } catch {}
-        return `${e.type},${e.path},"${msg}",${e.country},${e.created_at}`
+        const meta = parseMetadata(e.metadata);
+        msg = meta.message || meta.msg || '';
+        return `${e.type},${e.path},"${msg.replace(/"/g, '""')}",${e.country},${e.created_at}`
     }).join("\n");
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
@@ -272,8 +283,7 @@ const SiteDetail: React.FC<SiteDetailProps> = ({ siteId, onBack }) => {
                 </div>
              ) : (
                 stats.errors.slice().reverse().map((err, i) => {
-                  let meta: any = {};
-                  try { meta = JSON.parse(err.metadata || '{}'); } catch {}
+                  const meta = parseMetadata(err.metadata);
                   const msg = meta.message || meta.msg || 'Unknown Error';
                   const solution = getSolution(msg);
 
@@ -353,8 +363,7 @@ const SiteDetail: React.FC<SiteDetailProps> = ({ siteId, onBack }) => {
               <h3 className="text-lg font-serif text-white mb-6">User Interaction</h3>
               <div className="space-y-2">
                  {stats.clicks.slice().reverse().slice(0, 10).map((click, i) => {
-                   let meta: any = {};
-                   try { meta = JSON.parse(click.metadata || '{}'); } catch {}
+                   const meta = parseMetadata(click.metadata);
                    return (
                      <div key={i} className="flex items-center gap-3 p-3 bg-black rounded border border-onyx-800">
                         <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
@@ -388,11 +397,8 @@ const SiteDetail: React.FC<SiteDetailProps> = ({ siteId, onBack }) => {
           </div>
           <div className="max-h-[600px] overflow-y-auto p-4 space-y-1">
             {events.slice().reverse().map((e, i) => {
-               let metaStr = '';
-               try { 
-                 const m = JSON.parse(e.metadata || '{}');
-                 metaStr = m.message || m.url || JSON.stringify(m);
-               } catch { metaStr = e.metadata || ''; }
+               const meta = parseMetadata(e.metadata);
+               const metaStr = meta.message || meta.url || JSON.stringify(meta);
 
                const color = e.type === 'error' || e.type === 'network_fail' ? 'text-red-400' : 
                              e.type === 'click' ? 'text-green-400' : 'text-blue-400';

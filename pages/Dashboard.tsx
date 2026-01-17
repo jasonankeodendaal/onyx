@@ -122,8 +122,7 @@ const ONYX_SITE_ID = '${siteId}';
 // Vite / React Environment Variables
 const SUPABASE_URL = import.meta.env.VITE_PUBLIC_SUPABASE_URL; 
 const SUPABASE_KEY = import.meta.env.VITE_PUBLIC_SUPABASE_ANON_KEY;
-
-// Note: If using Next.js, use process.env.NEXT_PUBLIC_SUPABASE_URL instead
+const REGION = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Unknown';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 const SESSION_ID = Math.random().toString(36).substring(7);
@@ -138,6 +137,7 @@ export const initOnyx = () => {
       session_id: SESSION_ID,
       path: window.location.pathname,
       device: /Mobi/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop',
+      country: REGION,
       created_at: new Date().toISOString(),
       ...payload
     }).then(({ error }) => { if(error) console.error('Onyx Error:', error) });
@@ -145,10 +145,10 @@ export const initOnyx = () => {
 
   // Tracking Logic
   track('pageview', { load_time_ms: window.performance?.now() });
-  window.addEventListener('error', (e) => track('error', { metadata: JSON.stringify({ message: e.message }) }));
+  window.addEventListener('error', (e) => track('error', { metadata: { message: e.message } }));
   window.addEventListener('click', (e) => {
     const t = e.target.closest('button, a');
-    if (t) track('click', { metadata: JSON.stringify({ tag: t.tagName, text: t.innerText?.slice(0,50) }) });
+    if (t) track('click', { metadata: { tag: t.tagName, text: t.innerText?.slice(0,50) } });
   });
 };
 
@@ -165,16 +165,18 @@ export const initOnyx = () => {
 
     const client = window.supabase.createClient(URL, KEY);
     const SESSION = Math.random().toString(36).substring(7);
+    const REGION = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Unknown';
 
     const track = (t, d={}) => client.from('events').insert({
       site_id: SITE_ID, type: t, session_id: SESSION,
       path: window.location.pathname,
+      country: REGION,
       created_at: new Date().toISOString(),
       ...d
     });
 
     track('pageview');
-    window.addEventListener('error', e => track('error', { metadata: JSON.stringify({ msg: e.message }) }));
+    window.addEventListener('error', e => track('error', { metadata: { msg: e.message } }));
   })();
 </script>`;
   };

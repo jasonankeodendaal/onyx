@@ -21,7 +21,7 @@ export interface AnalyticsEvent {
   browser?: string;
   referrer?: string;
   load_time_ms?: number;
-  metadata?: string; // Stored as JSON string in DB
+  metadata?: any; // Can be JSON string or Object depending on Supabase return
   created_at: string;
   session_id?: string;
 }
