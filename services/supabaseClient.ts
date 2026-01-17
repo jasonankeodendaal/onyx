@@ -50,10 +50,11 @@ export const getSupabase = (): SupabaseClient | null => {
 // ONYX MONITOR SYSTEM SETUP SQL
 // ==============================================================================
 export const SETUP_SQL = `
--- ==============================================================================
--- 1. SETUP TABLES
--- ==============================================================================
+-- 1. RESET & CLEANUP (Optional - removing conflicts)
+-- drop policy if exists "Public Read Sites" on sites;
+-- drop policy if exists "Public Insert Sites" on sites;
 
+-- 2. CREATE TABLES
 create table if not exists sites (
   id uuid default gen_random_uuid() primary key,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
@@ -78,37 +79,44 @@ create table if not exists events (
   load_time_ms integer,
   session_id text,
   referrer text,
-  metadata jsonb -- Changed to JSONB for better error querying
+  metadata jsonb
 );
 
--- ==============================================================================
--- 2. CREATE INDEXES
--- ==============================================================================
+-- 3. ENABLE ROW LEVEL SECURITY
+alter table sites enable row level security;
+alter table events enable row level security;
 
+-- 4. CREATE INDEXES
 create index if not exists events_site_id_idx on events(site_id);
 create index if not exists events_created_at_idx on events(created_at);
 create index if not exists events_type_idx on events(type);
 
--- ==============================================================================
--- 3. CONFIGURE REALTIME
--- ==============================================================================
+-- 5. REALTIME PUBLICATION
+-- (Note: In Supabase Dashboard, you may also need to enable Replication on these tables)
+do $$
+begin
+  if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and tablename = 'events') then
+    alter publication supabase_realtime add table events;
+  end if;
+  if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and tablename = 'sites') then
+    alter publication supabase_realtime add table sites;
+  end if;
+end;
+$$;
 
--- Enable replication for specific tables to support real-time dashboards
-alter publication supabase_realtime add table events;
-alter publication supabase_realtime add table sites;
+-- 6. POLICIES & PERMISSIONS (CRITICAL FOR PUBLIC ACCESS)
 
--- ==============================================================================
--- 4. SECURITY POLICIES (RLS)
--- ==============================================================================
+-- Grant access to the anon key (public client)
+grant usage on schema public to postgres, anon, authenticated, service_role;
+grant all privileges on all tables in schema public to postgres, anon, authenticated, service_role;
+grant all privileges on all sequences in schema public to postgres, anon, authenticated, service_role;
 
-alter table sites enable row level security;
-alter table events enable row level security;
+-- Sites Policies
+create policy "Allow Public Read Sites" on sites for select using (true);
+create policy "Allow Public Insert Sites" on sites for insert with check (true);
+create policy "Allow Public Update Sites" on sites for update using (true);
 
--- Allow anonymous access (Adjust these if you require strict auth)
-create policy "Public Read Sites" on sites for select using (true);
-create policy "Public Insert Sites" on sites for insert with check (true);
-create policy "Public Update Sites" on sites for update using (true);
-
-create policy "Public Read Events" on events for select using (true);
-create policy "Public Insert Events" on events for insert with check (true);
+-- Events Policies
+create policy "Allow Public Read Events" on events for select using (true);
+create policy "Allow Public Insert Events" on events for insert with check (true);
 `;

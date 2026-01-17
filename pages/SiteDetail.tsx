@@ -7,7 +7,7 @@ import {
 import { 
   Activity, AlertCircle, Smartphone, Globe, Copy, CheckCircle, 
   Clock, Users, Layers, Monitor, Chrome, MapPin, 
-  ArrowUpRight, Download, Terminal, Shield, Zap
+  ArrowUpRight, Download, Terminal, Shield, Zap, RefreshCw
 } from '../components/Icons';
 
 interface SiteDetailProps {
@@ -23,6 +23,11 @@ const SiteDetail: React.FC<SiteDetailProps> = ({ siteId, onBack }) => {
   const [events, setEvents] = useState<AnalyticsEvent[]>([]);
   const [copied, setCopied] = useState(false);
   
+  // Live Status State
+  const [checking, setChecking] = useState(false);
+  const [liveStatus, setLiveStatus] = useState<'Unknown' | 'Online' | 'Unreachable'>('Unknown');
+  const [liveLatency, setLiveLatency] = useState(0);
+
   const supabase = getSupabase();
 
   useEffect(() => {
@@ -51,7 +56,7 @@ const SiteDetail: React.FC<SiteDetailProps> = ({ siteId, onBack }) => {
     };
   }, [supabase, siteId]);
 
-  // --- HEURISTIC ENGINE (No AI) ---
+  // --- HEURISTIC ENGINE ---
   const getSolution = (msg: string = ''): HeuristicSolution => {
     const m = msg.toLowerCase();
     if (m.includes('fetch') || m.includes('network') || m.includes('cors')) {
@@ -160,6 +165,24 @@ const SiteDetail: React.FC<SiteDetailProps> = ({ siteId, onBack }) => {
     link.click();
   }
 
+  const checkStatus = async () => {
+    if (!site?.url) return;
+    setChecking(true);
+    const start = performance.now();
+    try {
+      // no-cors allows us to ping the server even if it doesn't return CORS headers.
+      // We can't see the response content, but we know it reached the server if it doesn't throw.
+      await fetch(site.url, { mode: 'no-cors', cache: 'no-store' });
+      const duration = performance.now() - start;
+      setLiveLatency(Math.round(duration));
+      setLiveStatus('Online');
+    } catch (e) {
+      console.error(e);
+      setLiveStatus('Unreachable');
+    }
+    setChecking(false);
+  };
+
   if (!site) return <div className="p-20 text-center text-gray-500">Initializing Uplink...</div>;
 
   return (
@@ -185,10 +208,25 @@ const SiteDetail: React.FC<SiteDetailProps> = ({ siteId, onBack }) => {
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-           <button onClick={exportData} className="flex items-center gap-2 px-4 py-2 bg-onyx-900 border border-onyx-800 rounded-lg text-gray-400 hover:text-white text-sm">
-             <Download className="w-4 h-4" /> Export CSV
+        <div className="flex flex-wrap items-center gap-3">
+           
+           {/* Live Check Button */}
+           <button 
+             onClick={checkStatus} 
+             className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-colors
+              ${liveStatus === 'Online' ? 'bg-green-950/30 border-green-900/50 text-green-400' : 
+                liveStatus === 'Unreachable' ? 'bg-red-950/30 border-red-900/50 text-red-400' :
+                'bg-onyx-900 border-onyx-800 text-gray-400 hover:text-white'}`}
+           >
+             <RefreshCw className={`w-4 h-4 ${checking ? 'animate-spin' : ''}`} />
+             {checking ? 'Pinging...' : liveStatus === 'Unknown' ? 'Check Status' : liveStatus}
+             {liveStatus === 'Online' && <span className="ml-1 text-xs opacity-70">({liveLatency}ms)</span>}
            </button>
+
+           <button onClick={exportData} className="flex items-center gap-2 px-4 py-2 bg-onyx-900 border border-onyx-800 rounded-lg text-gray-400 hover:text-white text-sm">
+             <Download className="w-4 h-4" /> CSV
+           </button>
+           
            <div className="flex items-center gap-2 px-3 py-1 bg-green-900/20 border border-green-900/50 rounded-full">
              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
              <span className="text-xs text-green-400 font-medium">Scanning</span>

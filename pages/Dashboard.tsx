@@ -90,8 +90,11 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
         setNewSiteName('');
         setNewSiteUrl('');
       }
-    } catch (e) {
-      alert("Failed to create site. Check your table permissions.");
+    } catch (e: any) {
+      console.error("Creation Error:", e);
+      // More descriptive error message for RLS/Permission issues
+      const msg = e.message || e.details || "Unknown error";
+      alert(`Failed to create site: ${msg}. \n\nTip: Go to Supabase SQL Editor and run the setup script from the Docs page to ensure permissions are granted.`);
     }
   };
 

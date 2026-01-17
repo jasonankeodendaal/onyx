@@ -52,7 +52,8 @@ import {
   Cloud,
   Phone,
   Mail,
-  Upload
+  Upload,
+  RefreshCw
 } from 'lucide-react';
 
 export { 
@@ -108,5 +109,6 @@ export {
   Cloud,
   Phone,
   Mail,
-  Upload
+  Upload,
+  RefreshCw
 };
