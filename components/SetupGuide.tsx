@@ -132,7 +132,7 @@ export const initOnyx = () => {
     // 1. Init
     track('pageview', { load_time_ms: performance.now() });
 
-    // 2. Errors
+    // 2. Errors (Live Scanning)
     window.addEventListener('error', e => track('error', { 
       metadata: { msg: e.message, src: e.filename, line: e.lineno } 
     }));
@@ -221,11 +221,11 @@ export const initOnyx = () => {
                     </p>
                  </div>
                  <div className="p-6 bg-black rounded-xl border border-onyx-800 text-center relative group">
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-gray-800 rounded-full text-[10px] uppercase font-bold tracking-wider">Edge</div>
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-gray-800 rounded-full text-[10px] uppercase font-bold tracking-wider">Scanner</div>
                     <Globe className="w-8 h-8 mx-auto text-purple-500 mb-4" />
                     <h3 className="text-white font-medium mb-2">Deep Scan Agent</h3>
                     <p className="text-xs text-gray-500 leading-relaxed">
-                      A lightweight script running on your websites. It captures clicks, errors, and network fails 24/7.
+                      A lightweight script you paste into your other websites. It captures clicks, errors, and network fails 24/7.
                     </p>
                  </div>
               </div>
@@ -374,8 +374,8 @@ export const initOnyx = () => {
                       <Code className="w-6 h-6 text-purple-400" />
                     </div>
                     <div>
-                      <h2 className="text-2xl font-serif text-white">The Deep Scan Agent</h2>
-                      <p className="text-gray-400 text-sm">Generic Templates for Reference. (For actual ID-specific code, go to Dashboard > Add Site).</p>
+                      <h2 className="text-2xl font-serif text-white">The Scanner (Agent)</h2>
+                      <p className="text-gray-400 text-sm">Paste this code into the websites you want to monitor to enable 24/7 scanning.</p>
                     </div>
                  </div>
 
